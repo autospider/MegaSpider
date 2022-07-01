@@ -1,6 +1,6 @@
 module.exports = {
   name: 'MegaSpider',
-  title: 'Vue Element Admin',
+  title: 'MegaSpider',
 
   /**
    * @type {boolean} true | false

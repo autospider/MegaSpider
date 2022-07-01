@@ -7,7 +7,7 @@ MegaSpider是一款新一代网页采集工具，它功能强大，操作简单�
 
 ## 环境
 
-- Python 3.8+
+- Python 3.8+、Node LTS
 - Linux, Windows, macOS
 
 
@@ -21,10 +21,9 @@ MegaSpider是一款新一代网页采集工具，它功能强大，操作简单�
     - [www](https://github.com/autospider/MegaSpider/blob/main/www)目录下生成打包文件
 
 - 后端部署
-
-    - 在终端中执行 `python3 api`
-    - 在终端中执行 `python3 main`
+    - 在终端中执行 `pip install -r requirements.txt`
+    - 在终端中执行 `python3 main.py`
     - 浏览器打开 [http://localhost:8765](http://localhost:8765)
 
 ## 许可协议
-  该项目在 MIT 许可下获得许可 - 请参阅[LICENSE](https://github.com/autospider/MegaSpider/blob/main/LICENSE) 文件了解详细信息
+  该项目在 MIT 许可下获得许可 - 请参阅[LICENSE](https://github.com/autospider/MegaSpider/blob/main/LICENSE) 文件了解详细信息。

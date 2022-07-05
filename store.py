@@ -148,23 +148,3 @@ class Store(object):
                         iConn['db'].rollback()
                 iCursor.close()
 
-
-if __name__ == '__main__':
-    import datetime
-
-    tStore = Store()
-    iTask = {
-        'targetType': 'database', 'target': 'mongodb', 'encoding': 'utf8',
-        'parameter': 'talent|url,title,taskKey,created,user',
-        'task': [
-            {
-                'jobCategory': '医疗器械',
-                'title': '医疗招聘电工|南方医院泰成逸园分院|广州市、佛山市-中国医疗人才网',
-                'taskKey': 'recruiting.doctorjob.com.cn',
-                'url': 'http://www.doctorjob.com.cn/resume/util/p639921.html',
-                'created': datetime.datetime(2022, 6, 30, 11, 22, 5, 479787),
-                'flag': 0
-            }
-        ]
-    }
-    tStore.doStore(iTask)

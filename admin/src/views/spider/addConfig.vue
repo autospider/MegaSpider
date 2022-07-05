@@ -140,7 +140,29 @@
         <div style="
     margin-top: 20px;
 ">
-          <el-button type="primary" size="small" @click="getConfigFile()">保存</el-button>
+          <el-row>
+            <el-col :span="2"><div class="grid-content bg-purple">
+              <el-button type="primary" size="small" @click="getConfigFile({operation:'保存'})">保存</el-button>
+            </div></el-col>
+            <el-col :span="3"><div class="grid-content bg-purple-light">
+              <el-upload
+                class="upload-demo"
+                ref="upload"
+                accept=".json"
+                action=''
+                :on-change="changeDemoFile"
+                :file-list="demoFileList"
+                :auto-upload="false">
+                <el-button slot="trigger" size="small" type="primary">导入配置文件</el-button>
+              </el-upload>
+
+            </div></el-col>
+            <el-col :span="2"><div class="grid-content bg-purple">
+              <el-button type="primary" size="small" @click="getConfigFile({operation:'导出'})">导出配置文件</el-button>
+
+            </div></el-col>
+          </el-row>
+<!--          <el-button type="primary" size="small" @click="importFile()">导入配置文件</el-button>-->
         </div>
       </el-tab-pane>
       <el-tab-pane label="解析器" name="second">
@@ -697,6 +719,7 @@ import {getDb,getEntrance} from "../../api/role";
 export default {
   data() {
     return {
+      demoFileList: [],
       parameterData:{},
       paramVisible:false,
       labelPosition:'left',
@@ -1729,10 +1752,51 @@ export default {
     // this.getSpider()
 
     this.getData()
-    this.getSetting()
+    this.getSetting(this.$route.params)
     // this.dataSource = rolesList
   },
   methods: {
+    changeDemoFile(file,demoFileList){
+        let fileReader= new FileReader()
+        fileReader.onload = async (e) => {
+          try {
+            let document = JSON.parse(e.target.result)
+            this.demo = JSON.stringify(document)
+            document.taskKey = this.$route.params.taskKey
+            this.getSetting(document)
+            if(this.isJSON(this.demo)){
+              this.$message('满足json格式')
+            }else {
+              this.$message('不满足json格式，请重新选择文件或修改文件。')
+            }
+          } catch (err) {
+            console.log(`load JSON document from file error: ${err.message}`)
+            demoFileList = []
+            // this.showSnackbar(`Load JSON document from file error: ${err.message}`, 4000)
+            alert('填充失败，请重新选择文件或手动输入。')
+          }
+        }
+        fileReader.readAsText(file.raw)
+
+    },
+    isJSON(str) {
+      // 判断一个string是否是json类型，用于格式校验
+      if (typeof str == 'string') {
+        try {
+          var obj=JSON.parse(str);
+          if(typeof obj == 'object' && obj ){
+            return true;
+          }else{
+            return false;
+          }
+
+        } catch(e) {
+          console.log('error：'+str+'!!!'+e);
+          return false;
+        }
+      }
+      console.log('It is not a string!')
+    },
     addParameter(){
       let value = ''
       if(this.isNotEmptyStr(this.parameterForm.table)&&this.isNotEmptyStr(this.parameterForm.tableKey)){
@@ -1747,8 +1811,8 @@ export default {
       this.paramVisible=true
       this.parameterData = data
     },
-    getSetting(){
-      const configFile = this.$route.params
+    getSetting(needData){
+      const configFile = needData
       if (!this.isNotEmptyStr(configFile.taskKey)){
         configFile.taskKey=uuidv4()
       }
@@ -3106,7 +3170,7 @@ export default {
       // console.log(data.index)
       data[data.col.prop].show=false
     },
-    getConfigFile(){
+    getConfigFile(commitData){
       const configFile = {}
       const  settingData = this.senderData
       const entranceData = this.entranceData
@@ -3454,30 +3518,36 @@ export default {
         this.$message.error('taskName、taskKey、resourceKey为必填项，请完善之后下载！');
       }
       else{
-        if(this.$route.params.flag!=1){
-          this.$axios.post('/dev-prod/spider/save',  configFile, { headers: { 'accept': 'application/json','Content-Type': 'application/json' } }).then(res => {
-            if(res.status==200&&res.data.msg=='success'){
-              this.$message({
-                message: '配置文件已保存',
-                type: 'success'
+        if(commitData.operation=='导出'){
+          FileSaver.saveAs(blob, `configFile.json`);
+        }
+        else {
+          if(this.$route.params.flag!=1){
+            this.$axios.post('/dev-prod/spider/save',  configFile, { headers: { 'accept': 'application/json','Content-Type': 'application/json' } }).then(res => {
+              if(res.status==200&&res.data.msg=='success'){
+                this.$message({
+                  message: '配置文件已保存',
+                  type: 'success'
 
-              });
-              const that = this
-              setTimeout(function(){
-                that.$router.push({
-                  name: 'spider',
-                  path: '/tinymce/index',
-                })},500);
-              // this.$router.go(0)
-            }
-            else{
-              this.$message.error('配置文件保存失败，请重试！');
-            }
-          })
+                });
+                const that = this
+                setTimeout(function(){
+                  that.$router.push({
+                    name: 'spider',
+                    path: '/tinymce/index',
+                  })},500);
+                // this.$router.go(0)
+              }
+              else{
+                this.$message.error('配置文件保存失败，请重试！');
+              }
+            })
+          }
+          else{
+            this.$message.error('爬虫正在运行中，不能修改配置，请修改爬虫状态后再操作');
+          }
         }
-        else{
-          this.$message.error('爬虫正在运行中，不能修改配置，请修改爬虫状态后再操作');
-        }
+
 
         // FileSaver.saveAs(blob, `configFile.json`);
 
@@ -4588,6 +4658,18 @@ export default {
 }
 </script>
 <style lang="scss">
+  .el-row {
+    margin-bottom: 20px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  .el-col {
+    border-radius: 4px;
+  }
+  .bg-purple-dark {
+    background: #99a9bf;
+  }
   /*.inputDeep .el-input--medium .el-input__inner{*/
   /*  border-top: none ;*/
   /*  border-left: none !important;*/

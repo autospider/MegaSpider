@@ -24,6 +24,14 @@ MegaSpider是一款新一代网页采集工具，它功能强大，操作简单�
     - 在终端中执行 `pip install -r requirements.txt`
     - 在终端中执行 `python3 main.py`
     - 浏览器打开 [http://localhost:8765](http://localhost:8765)
-
+  
+## 数据库支持
+  - MySQL
+  - PostgreSQL
+  - SqlServer
+  - Oracle
+    - [oracle客户端下载](https://www.oracle.com/cn/database/technology/instant-client.html)
+  - MongoDB
+  
 ## 许可协议
   该项目在 MIT 许可下获得许可 - 请参阅[LICENSE](https://github.com/autospider/MegaSpider/blob/main/LICENSE) 文件了解详细信息。
